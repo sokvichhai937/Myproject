@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ទំព័រដើម - Social Platform</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-light sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="home.html">
+                <i class="bi bi-people-fill"></i> Social
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="mx-auto search-bar d-none d-lg-block">
+                    <input type="text" class="form-control" id="searchInput" placeholder="ស្វែងរកអ្នកប្រើប្រាស់...">
+                </div>
+                
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="home.html">
+                            <i class="bi bi-house-fill"></i> ទំព័រដើម
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="messages.html">
+                            <i class="bi bi-chat-fill"></i> សារ
+                        </a>
+                    </li>
+                    <li class="nav-item position-relative">
+                        <a class="nav-link" href="notifications.html">
+                            <i class="bi bi-bell-fill"></i> ជូនដំណឹង
+                            <span class="badge bg-danger d-none" id="notificationBadge">0</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="profileLink">
+                            <i class="bi bi-person-fill"></i> Profile
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="logout()">
+                            <i class="bi bi-box-arrow-right"></i> ចាកចេញ
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <div class="row">
+            <!-- Main Feed -->
+            <div class="col-lg-8">
+                <!-- Create Post Form -->
+                <div class="create-post-form">
+                    <form id="createPostForm">
+                        <div class="d-flex align-items-start mb-3">
+                            <div class="profile-image-small me-2" id="userProfileImage">
+                                <div class="profile-placeholder">U</div>
+                            </div>
+                            <textarea class="form-control flex-grow-1" id="postContent" rows="3" placeholder="តើអ្នកកំពុងគិតអំពីអ្វី?"></textarea>
+                        </div>
+                        
+                        <div id="imagePreview"></div>
+                        
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <input type="file" id="postImage" accept="image/*" class="d-none">
+                                <button type="button" class="btn btn-outline-primary btn-sm" onclick="document.getElementById('postImage').click()">
+                                    <i class="bi bi-image"></i> រូបភាព
+                                </button>
+                            </div>
+                            <button type="submit" class="btn btn-primary">បង្ហោះ</button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Posts Feed -->
+                <div id="postsFeed"></div>
+            </div>
+            
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                <div class="sidebar">
+                    <h5>អ្នកប្រើប្រាស់ដែលអាចតាមដាន</h5>
+                    <div id="suggestedUsers"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="js/main.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/posts.js"></script>
+    <script src="js/profile.js"></script>
+    <script src="js/notifications.js"></script>
+    
+    <script>
+        // Check session
+        const currentUser = checkSession();
+        if (!currentUser) {
+            window.location.href = 'index.html';
+        }
+        
+        // Update profile link
+        document.getElementById('profileLink').href = `profile.html?user=${currentUser.username}`;
+        
+        // Update user profile image in create post form
+        const userProfileImageDiv = document.getElementById('userProfileImage');
+        if (currentUser.profileImage) {
+            userProfileImageDiv.innerHTML = `<img src="${currentUser.profileImage}" alt="${currentUser.fullName}">`;
+        } else {
+            userProfileImageDiv.innerHTML = `<div class="profile-placeholder">${currentUser.fullName.charAt(0)}</div>`;
+        }
+        
+        // Display posts
+        displayPosts('postsFeed');
+        
+        // Create post form
+        document.getElementById('createPostForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const content = document.getElementById('postContent').value;
+            const imageInput = document.getElementById('postImage');
+            const imageFile = imageInput.files[0];
+            
+            if (imageFile) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const result = createPost(currentUser.username, content, event.target.result);
+                    if (result.success) {
+                        document.getElementById('postContent').value = '';
+                        imageInput.value = '';
+                        document.getElementById('imagePreview').innerHTML = '';
+                        displayPosts('postsFeed');
+                    }
+                };
+                reader.readAsDataURL(imageFile);
+            } else {
+                const result = createPost(currentUser.username, content);
+                if (result.success) {
+                    document.getElementById('postContent').value = '';
+                    displayPosts('postsFeed');
+                } else {
+                    alert(result.message);
+                }
+            }
+        });
+        
+        // Image preview
+        document.getElementById('postImage').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            const preview = document.getElementById('imagePreview');
+            
+            if (file) {
+                if (file.size > 5000000) {
+                    alert('រូបភាពធំពេក! សូមជ្រើសរើសរូបភាពតូចជាង 5MB');
+                    this.value = '';
+                    preview.innerHTML = '';
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    preview.innerHTML = `
+                        <div class="position-relative d-inline-block">
+                            <img src="${event.target.result}" class="img-fluid rounded" style="max-height: 300px;">
+                            <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-2" onclick="document.getElementById('postImage').value=''; document.getElementById('imagePreview').innerHTML='';">
+                                <i class="bi bi-x"></i>
+                            </button>
+                        </div>
+                    `;
+                };
+                reader.readAsDataURL(file);
+            } else {
+                preview.innerHTML = '';
+            }
+        });
+        
+        // Display suggested users
+        const allUsers = getAllUsers();
+        const suggestedUsers = allUsers
+            .filter(u => u.username !== currentUser.username)
+            .slice(0, 5);
+        
+        const suggestedUsersDiv = document.getElementById('suggestedUsers');
+        suggestedUsersDiv.innerHTML = suggestedUsers.map(user => {
+            const isFollowing = currentUser.following.includes(user.username);
+            return `
+                <div class="d-flex align-items-center mb-3">
+                    <div class="profile-image-small me-2">
+                        ${user.profileImage ? `<img src="${user.profileImage}" alt="${user.fullName}">` : 
+                        `<div class="profile-placeholder">${user.fullName.charAt(0)}</div>`}
+                    </div>
+                    <div class="flex-grow-1">
+                        <a href="profile.html?user=${user.username}" class="text-decoration-none text-dark">
+                            <div class="fw-bold">${escapeHtml(user.fullName)}</div>
+                            <small class="text-muted">@${user.username}</small>
+                        </a>
+                    </div>
+                    <button class="btn btn-sm ${isFollowing ? 'btn-outline-primary' : 'btn-primary'}" 
+                            onclick="toggleFollowUser('${user.username}')">
+                        ${isFollowing ? 'កំពុងតាមដាន' : 'តាមដាន'}
+                    </button>
+                </div>
+            `;
+        }).join('');
+        
+        function toggleFollowUser(targetUsername) {
+            const result = toggleFollow(targetUsername, currentUser.username);
+            if (result.success) {
+                location.reload();
+            }
+        }
+        
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const query = e.target.value.trim();
+            if (query.length >= 2) {
+                const results = searchUsers(query);
+                // You can implement a dropdown to show search results
+                console.log('Search results:', results);
+            }
+        });
+    </script>
+</body>
+</html>
