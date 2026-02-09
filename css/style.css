@@ -551,6 +551,13 @@ body {
   }
 }
 
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .nav-link .badge {
+    animation: none;
+  }
+}
+
 /* Badge */
 .badge {
   padding: 5px 10px;
