@@ -1,4 +1,13 @@
 // ឧបករណ៍ប្រើប្រាស់ទូទៅ (Common Utilities)
+//
+// ចំណាំ: ឥឡូវនេះមានប្រព័ន្ធ Data Store មជ្ឈមណ្ឌលថ្មី!
+// NOTE: A new centralized Data Store system is now available!
+// 
+// សូមមើល dataStore.js សម្រាប់មុខងារ Data Store ថ្មី
+// See dataStore.js for new Data Store functionality
+// 
+// មុខងារទាំងនេះនៅតែរក្សាសម្រាប់ backward compatibility
+// These functions are kept for backward compatibility
 
 // ពិនិត្យ Session
 function checkSession() {
