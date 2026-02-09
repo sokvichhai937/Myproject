@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Store Demo - ការបង្ហាញប្រព័ន្ធទិន្នន័យ</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <i class="bi bi-database-fill"></i> Data Store Demo
+            </a>
+            <button class="btn btn-outline-light" onclick="window.location.href='index.html'">
+                <i class="bi bi-house-fill"></i> ទៅទំព័រដើម
+            </button>
+        </div>
+    </nav>
+
+    <div class="container mt-4 mb-5">
+        <div class="row">
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0"><i class="bi bi-database-fill"></i> ប្រព័ន្ធ Data Store មជ្ឈមណ្ឌល</h4>
+                    </div>
+                    <div class="card-body">
+                        <p class="lead">
+                            ប្រព័ន្ធ Data Store នេះផ្តល់នូវវិធីសាស្រ្តមជ្ឈមណ្ឌលក្នុងការគ្រប់គ្រងទិន្នន័យទាំងអស់របស់កម្មវិធី។
+                        </p>
+                        <p>
+                            <strong>មុខងារសំខាន់ៗ:</strong>
+                        </p>
+                        <ul>
+                            <li>គ្រប់គ្រងអ្នកប្រើប្រាស់ (Users Management)</li>
+                            <li>គ្រប់គ្រងប្រកាស (Posts Management)</li>
+                            <li>គ្រប់គ្រងមតិយោបល់ (Comments Management)</li>
+                            <li>គ្រប់គ្រងសារ (Messages Management)</li>
+                            <li>គ្រប់គ្រងជូនដំណឹង (Notifications Management)</li>
+                            <li>នាំចេញ/នាំចូលទិន្នន័យ (Export/Import Data)</li>
+                            <li>ស្ថិតិទិន្នន័យ (Statistics)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0"><i class="bi bi-graph-up"></i> ស្ថិតិទិន្នន័យ (Data Statistics)</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row" id="statisticsContainer">
+                            <!-- Statistics will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Operations -->
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="bi bi-box-arrow-down"></i> នាំចូលទិន្នន័យ (Import Data)</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="importData" class="form-label">បិតភ្ជាប់ JSON Data:</label>
+                            <textarea class="form-control" id="importData" rows="5" placeholder='{"users": [...], "posts": [...], ...}'></textarea>
+                        </div>
+                        <button class="btn btn-success" onclick="importDataFromTextarea()">
+                            <i class="bi bi-upload"></i> នាំចូល
+                        </button>
+                        <div id="importResult" class="mt-2"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0"><i class="bi bi-box-arrow-up"></i> នាំចេញទិន្នន័យ (Export Data)</h5>
+                    </div>
+                    <div class="card-body">
+                        <p>នាំចេញទិន្នន័យទាំងអស់ជា JSON format:</p>
+                        <button class="btn btn-warning" onclick="exportData()">
+                            <i class="bi bi-download"></i> នាំចេញទិន្នន័យ
+                        </button>
+                        <button class="btn btn-secondary" onclick="downloadData()">
+                            <i class="bi bi-file-earmark-arrow-down"></i> ទាញយកឯកសារ
+                        </button>
+                        <div class="mt-3">
+                            <textarea class="form-control" id="exportedData" rows="5" readonly placeholder="នាំចេញទិន្នន័យនឹងបង្ហាញនៅទីនេះ"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Operations -->
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="bi bi-people-fill"></i> អ្នកប្រើប្រាស់ (Users)</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>ឈ្មោះអ្នកប្រើ</th>
+                                        <th>ឈ្មោះពេញ</th>
+                                        <th>អ៊ីមែល</th>
+                                        <th>អ្នកតាមដាន</th>
+                                        <th>កំពុងតាមដាន</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="usersTableBody">
+                                    <!-- Users will be loaded here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Posts -->
+        <div class="row mt-4">
+            <div class="col-md-12">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-secondary text-white">
+                        <h5 class="mb-0"><i class="bi bi-card-text"></i> ប្រកាសចុងក្រោយ (Recent Posts)</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="recentPostsContainer">
+                            <!-- Recent posts will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Clear Data -->
+        <div class="row mt-4 mb-5">
+            <div class="col-md-12">
+                <div class="card shadow-sm border-danger">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="mb-0"><i class="bi bi-trash-fill"></i> ផ្សេងៗ (Other Operations)</h5>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>ប្រយ័ត្ន:</strong> ប្រតិបត្តិការទាំងនេះអាចលុបទិន្នន័យ!</p>
+                        <button class="btn btn-warning" onclick="resetSampleData()">
+                            <i class="bi bi-arrow-clockwise"></i> កំណត់ទិន្នន័យគំរូឡើងវិញ
+                        </button>
+                        <button class="btn btn-danger" onclick="clearAllData()">
+                            <i class="bi bi-trash-fill"></i> លុបទិន្នន័យទាំងអស់
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Data Store JS -->
+    <script src="js/dataStore.js"></script>
+    
+    <script>
+        // Load and display statistics
+        function loadStatistics() {
+            const stats = dataStore.getStatistics();
+            const container = document.getElementById('statisticsContainer');
+            
+            container.innerHTML = `
+                <div class="col-md-2 mb-3">
+                    <div class="card bg-primary text-white">
+                        <div class="card-body text-center">
+                            <h3>${stats.users}</h3>
+                            <p class="mb-0">អ្នកប្រើប្រាស់</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <div class="card bg-success text-white">
+                        <div class="card-body text-center">
+                            <h3>${stats.posts}</h3>
+                            <p class="mb-0">ប្រកាស</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <div class="card bg-info text-white">
+                        <div class="card-body text-center">
+                            <h3>${stats.comments}</h3>
+                            <p class="mb-0">មតិយោបល់</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <div class="card bg-warning text-dark">
+                        <div class="card-body text-center">
+                            <h3>${stats.messages}</h3>
+                            <p class="mb-0">សារ</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <div class="card bg-secondary text-white">
+                        <div class="card-body text-center">
+                            <h3>${stats.notifications}</h3>
+                            <p class="mb-0">ជូនដំណឹង</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2 mb-3">
+                    <div class="card bg-dark text-white">
+                        <div class="card-body text-center">
+                            <h6>${stats.totalSize}</h6>
+                            <p class="mb-0 small">ទំហំ Storage</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Load and display users
+        function loadUsers() {
+            const users = dataStore.getUsers();
+            const tbody = document.getElementById('usersTableBody');
+            
+            if (users.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="text-center">មិនមានអ្នកប្រើប្រាស់</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = users.map(user => `
+                <tr>
+                    <td><strong>${user.username}</strong></td>
+                    <td>${user.fullName}</td>
+                    <td>${user.email}</td>
+                    <td>${user.followers ? user.followers.length : 0}</td>
+                    <td>${user.following ? user.following.length : 0}</td>
+                </tr>
+            `).join('');
+        }
+
+        // Load and display recent posts
+        function loadRecentPosts() {
+            const allPosts = dataStore.getPosts();
+            // Sort by timestamp to ensure we get the most recent posts
+            const sortedPosts = allPosts.sort((a, b) => 
+                new Date(b.timestamp) - new Date(a.timestamp)
+            );
+            const posts = sortedPosts.slice(0, 5); // Get 5 most recent
+            const container = document.getElementById('recentPostsContainer');
+            
+            if (posts.length === 0) {
+                container.innerHTML = '<p class="text-muted">មិនមានប្រកាស</p>';
+                return;
+            }
+            
+            container.innerHTML = posts.map(post => {
+                const user = dataStore.getUserByUsername(post.username);
+                return `
+                    <div class="card mb-2">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-2">
+                                <strong>${user ? user.fullName : post.username}</strong>
+                                <span class="text-muted ms-2 small">@${post.username}</span>
+                            </div>
+                            <p class="mb-2">${post.content}</p>
+                            <small class="text-muted">
+                                <i class="bi bi-heart"></i> ${post.likes ? post.likes.length : 0} likes
+                            </small>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Export data to textarea
+        function exportData() {
+            const data = dataStore.exportData();
+            document.getElementById('exportedData').value = data;
+            alert('ទិន្នន័យត្រូវបាននាំចេញជោគជ័យ!');
+        }
+
+        // Download data as JSON file
+        function downloadData() {
+            const data = dataStore.exportData();
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `social-platform-data-${Date.now()}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            alert('ទិន្នន័យត្រូវបានទាញយកជោគជ័យ!');
+        }
+
+        // Import data from textarea
+        function importDataFromTextarea() {
+            const textarea = document.getElementById('importData');
+            const resultDiv = document.getElementById('importResult');
+            
+            try {
+                const success = dataStore.importData(textarea.value);
+                if (success) {
+                    resultDiv.innerHTML = '<div class="alert alert-success">ទិន្នន័យត្រូវបាននាំចូលជោគជ័យ!</div>';
+                    // Reload all data displays
+                    loadStatistics();
+                    loadUsers();
+                    loadRecentPosts();
+                } else {
+                    resultDiv.innerHTML = '<div class="alert alert-danger">មានបញ្ហាក្នុងការនាំចូលទិន្នន័យ</div>';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '<div class="alert alert-danger">JSON format មិនត្រឹមត្រូវ</div>';
+            }
+        }
+
+        // Reset sample data
+        function resetSampleData() {
+            if (confirm('តើអ្នកចង់កំណត់ទិន្នន័យគំរូឡើងវិញមែនទេ?')) {
+                // Clear current data
+                dataStore.clear();
+                // Re-initialize
+                dataStore.initializeSampleData();
+                // Reload displays
+                loadStatistics();
+                loadUsers();
+                loadRecentPosts();
+                alert('ទិន្នន័យគំរូត្រូវបានកំណត់ឡើងវិញ!');
+            }
+        }
+
+        // Clear all data
+        function clearAllData() {
+            if (confirm('ប្រយ័ត្ន! នេះនឹងលុបទិន្នន័យទាំងអស់ និងមិនអាចត្រឡប់វិញបានទេ។\n\nសូមវាយ "DELETE" ដើម្បីបញ្ជាក់ការលុប។')) {
+                const confirmation = prompt('សូមវាយ DELETE ជាអក្សរធំដើម្បីបញ្ជាក់:');
+                if (confirmation === 'DELETE') {
+                    dataStore.clear();
+                    loadStatistics();
+                    loadUsers();
+                    loadRecentPosts();
+                    alert('ទិន្នន័យទាំងអស់ត្រូវបានលុប!');
+                } else {
+                    alert('ការលុបត្រូវបានបោះបង់');
+                }
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStatistics();
+            loadUsers();
+            loadRecentPosts();
+        });
+    </script>
+</body>
+</html>

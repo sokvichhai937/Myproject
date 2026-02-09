@@ -69,6 +69,7 @@ A complete social media platform built with Bootstrap 5, HTML, CSS, and vanilla 
 ├── profile.html           # User profile page
 ├── messages.html          # Messaging page
 ├── notifications.html     # Notifications page
+├── datastore-demo.html    # Data Store demo page
 ├── css/
 │   └── style.css          # Custom styles
 ├── js/
@@ -77,6 +78,7 @@ A complete social media platform built with Bootstrap 5, HTML, CSS, and vanilla 
 │   ├── profile.js        # Profile management
 │   ├── messages.js       # Messaging system
 │   ├── notifications.js  # Notifications
+│   ├── dataStore.js      # Centralized Data Store (NEW!)
 │   └── main.js           # Common utilities
 └── assets/
     └── images/           # Default images
@@ -121,6 +123,40 @@ All data is stored in browser's localStorage:
 - Messages
 - Notifications
 - Follow relationships
+
+**NEW: Centralized Data Store System**
+
+A new centralized Data Store module (`dataStore.js`) is now available that provides:
+- **Organized API**: Clean, consistent methods for all data operations
+- **Better Error Handling**: Try-catch blocks and error logging
+- **Enhanced Features**: 
+  - Export/Import data functionality
+  - Storage statistics and size tracking
+  - Batch operations
+  - Data validation
+- **Demo Page**: Visit `datastore-demo.html` to explore the Data Store features
+- **Backward Compatible**: Existing code continues to work without changes
+
+To use the new Data Store in your code:
+```javascript
+// Get all users
+const users = dataStore.getUsers();
+
+// Add a new post
+dataStore.addPost({
+    id: Date.now(),
+    username: 'user123',
+    content: 'Hello World!',
+    likes: [],
+    timestamp: new Date().toISOString()
+});
+
+// Export all data
+const jsonData = dataStore.exportData();
+
+// Get statistics
+const stats = dataStore.getStatistics();
+```
 
 ### Security Features
 - Input sanitization to prevent XSS attacks
