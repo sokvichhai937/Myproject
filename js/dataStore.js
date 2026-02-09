@@ -239,7 +239,7 @@ class DataStore {
      */
     addPost(post) {
         const posts = this.getPosts();
-        posts.unshift(post); // Add to beginning for chronological order
+        posts.unshift(post); // Add to beginning for reverse chronological order (newest first)
         return this.savePosts(posts);
     }
 
@@ -671,7 +671,7 @@ class DataStore {
 // Create singleton instance
 const dataStore = new DataStore();
 
-// Initialize sample data when loaded
+// Initialize sample data when loaded (only once)
 if (typeof window !== 'undefined') {
     dataStore.initializeSampleData();
 }

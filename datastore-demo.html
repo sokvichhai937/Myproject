@@ -263,7 +263,12 @@
 
         // Load and display recent posts
         function loadRecentPosts() {
-            const posts = dataStore.getPosts().slice(0, 5); // Get 5 most recent
+            const allPosts = dataStore.getPosts();
+            // Sort by timestamp to ensure we get the most recent posts
+            const sortedPosts = allPosts.sort((a, b) => 
+                new Date(b.timestamp) - new Date(a.timestamp)
+            );
+            const posts = sortedPosts.slice(0, 5); // Get 5 most recent
             const container = document.getElementById('recentPostsContainer');
             
             if (posts.length === 0) {
@@ -350,13 +355,16 @@
 
         // Clear all data
         function clearAllData() {
-            if (confirm('ប្រយ័ត្ន! នេះនឹងលុបទិន្នន័យទាំងអស់។ តើអ្នកប្រាកដទេ?')) {
-                if (confirm('តើអ្នកពិតជាប្រាកដមែនទេ? មិនអាចត្រឡប់វិញបានទេ!')) {
+            if (confirm('ប្រយ័ត្ន! នេះនឹងលុបទិន្នន័យទាំងអស់ និងមិនអាចត្រឡប់វិញបានទេ។\n\nសូមវាយ "DELETE" ដើម្បីបញ្ជាក់ការលុប។')) {
+                const confirmation = prompt('សូមវាយ DELETE ជាអក្សរធំដើម្បីបញ្ជាក់:');
+                if (confirmation === 'DELETE') {
                     dataStore.clear();
                     loadStatistics();
                     loadUsers();
                     loadRecentPosts();
                     alert('ទិន្នន័យទាំងអស់ត្រូវបានលុប!');
+                } else {
+                    alert('ការលុបត្រូវបានបោះបង់');
                 }
             }
         }
