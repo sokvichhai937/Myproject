@@ -63,8 +63,11 @@
             <!-- Conversations List -->
             <div class="col-lg-4">
                 <div class="card">
-                    <div class="card-header">
+                    <div class="card-header d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">ការសន្ទនា</h5>
+                        <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#newChatModal">
+                            <i class="bi bi-plus-lg"></i>
+                        </button>
                     </div>
                     <div class="list-group list-group-flush" id="conversationsList">
                         <!-- Conversations will be loaded here -->
@@ -102,6 +105,24 @@
         </div>
     </div>
 
+    <!-- New Chat Modal -->
+    <div class="modal fade" id="newChatModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">ចាប់ផ្តើមការសន្ទនាថ្មី</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" class="form-control mb-3" id="searchUsersInput" placeholder="ស្វែងរកអ្នកប្រើប្រាស់...">
+                    <div id="usersList">
+                        <!-- Users will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Custom JS -->
@@ -119,6 +140,55 @@
         
         // Update profile link
         document.getElementById('profileLink').href = `profile.html?user=${currentUser.username}`;
+        
+        // Load users for new chat modal
+        function loadUsersForChat(searchQuery = '') {
+            const allUsers = getAllUsers();
+            let users = allUsers.filter(u => u.username !== currentUser.username);
+            
+            if (searchQuery) {
+                users = users.filter(u => 
+                    u.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    u.fullName.toLowerCase().includes(searchQuery.toLowerCase())
+                );
+            }
+            
+            const usersList = document.getElementById('usersList');
+            if (users.length === 0) {
+                usersList.innerHTML = '<p class="text-muted text-center">រកមិនឃើញអ្នកប្រើប្រាស់</p>';
+                return;
+            }
+            
+            usersList.innerHTML = users.map(user => `
+                <div class="d-flex align-items-center mb-3 p-2 border-bottom user-item" style="cursor: pointer;" onclick="startNewChat('${user.username}')">
+                    <div class="profile-image-small me-2">
+                        ${user.profileImage ? `<img src="${user.profileImage}" alt="${user.fullName}">` : 
+                        `<div class="profile-placeholder">${user.fullName.charAt(0)}</div>`}
+                    </div>
+                    <div>
+                        <div class="fw-bold">${escapeHtml(user.fullName)}</div>
+                        <small class="text-muted">@${user.username}</small>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Start new chat
+        function startNewChat(username) {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('newChatModal'));
+            modal.hide();
+            openChat(username);
+        }
+        
+        // Search users in modal
+        document.getElementById('searchUsersInput').addEventListener('input', function(e) {
+            loadUsersForChat(e.target.value.trim());
+        });
+        
+        // Load users when modal is shown
+        document.getElementById('newChatModal').addEventListener('shown.bs.modal', function() {
+            loadUsersForChat();
+        });
     </script>
 </body>
 </html>

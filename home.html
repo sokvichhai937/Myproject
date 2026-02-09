@@ -216,10 +216,15 @@
                             <small class="text-muted">@${user.username}</small>
                         </a>
                     </div>
-                    <button class="btn btn-sm ${isFollowing ? 'btn-outline-primary' : 'btn-primary'}" 
-                            onclick="toggleFollowUser('${user.username}')">
-                        ${isFollowing ? 'កំពុងតាមដាន' : 'តាមដាន'}
-                    </button>
+                    <div class="btn-group" role="group">
+                        <button class="btn btn-sm ${isFollowing ? 'btn-outline-primary' : 'btn-primary'}" 
+                                onclick="toggleFollowUser('${user.username}')">
+                            ${isFollowing ? 'កំពុងតាមដាន' : 'តាមដាន'}
+                        </button>
+                        <a href="messages.html?user=${user.username}" class="btn btn-sm btn-outline-secondary" title="ផ្ញើសារ">
+                            <i class="bi bi-chat-fill"></i>
+                        </a>
+                    </div>
                 </div>
             `;
         }).join('');
